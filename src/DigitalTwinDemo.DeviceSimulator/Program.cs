@@ -14,14 +14,14 @@ namespace DigitalTwinDemo.DeviceSimulator
             string sDevice01 = ConfigurationManager.AppSettings["DEVICE001"];
             string sDevice02 = ConfigurationManager.AppSettings["DEVICE002"];
 
-            Task task1 = Task.Factory.StartNew(() => doStuffAsync("Device001",sDevice01));
-            Task task2 = Task.Factory.StartNew(() => doStuffAsync("Device002", sDevice02));
+            Task task1 = Task.Factory.StartNew(() => SimulateDeviceAsync("Device001",sDevice01));
+            Task task2 = Task.Factory.StartNew(() => SimulateDeviceAsync("Device002", sDevice02));
 
             await Task.WhenAll(task1, task2);
             Console.ReadLine();
         }
 
-        static async Task doStuffAsync(string deviceName, string connectionString)
+        static async Task SimulateDeviceAsync(string deviceName, string connectionString)
         {
             var deviceClient = DeviceClient.CreateFromConnectionString(connectionString);
 
