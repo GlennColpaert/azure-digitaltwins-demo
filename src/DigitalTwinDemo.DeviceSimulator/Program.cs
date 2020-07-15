@@ -7,14 +7,18 @@ using System.Threading.Tasks;
 
 namespace DigitalTwinDemo.DeviceSimulator
 {
-    class Program
+    public class Program
     {
+        static readonly double avgTemperature = 21;
+        static readonly double avgHumidity = 50;
+        static readonly Random rand = new Random();
+
         static async Task Main(string[] args)
         {
             string sDevice01 = ConfigurationManager.AppSettings["DEVICE001"];
             string sDevice02 = ConfigurationManager.AppSettings["DEVICE002"];
 
-            Task task1 = Task.Factory.StartNew(() => SimulateDeviceAsync("Device001",sDevice01));
+            Task task1 = Task.Factory.StartNew(() => SimulateDeviceAsync("Device001", sDevice01));
             Task task2 = Task.Factory.StartNew(() => SimulateDeviceAsync("Device002", sDevice02));
 
             await Task.WhenAll(task1, task2);
@@ -25,18 +29,18 @@ namespace DigitalTwinDemo.DeviceSimulator
         {
             var deviceClient = DeviceClient.CreateFromConnectionString(connectionString);
 
-            double avgTemperature = 21;
-            Random rand = new Random();
-
             while (true)
             {
                 double currentTemperature = avgTemperature + rand.NextDouble() * 4 - 3;
+                double currentHumidity = avgHumidity + rand.NextDouble() * 4 - 3;
 
-                var telemetryDataPoint = new
+                var telemetryMessage = new
                 {
-                    Temperature = currentTemperature
+                    Temperature = currentTemperature,
+                    Humidity = currentHumidity
                 };
-                var messageString = JsonConvert.SerializeObject(telemetryDataPoint);
+
+                var messageString = JsonConvert.SerializeObject(telemetryMessage);
                 var message = new Message(Encoding.ASCII.GetBytes(messageString));
                 await deviceClient.SendEventAsync(message);
                 Console.WriteLine("{0} > Sending message for Device {1}: {2}", DateTime.Now, deviceName, messageString);
