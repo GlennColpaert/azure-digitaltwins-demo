@@ -17,9 +17,8 @@ namespace DigitalTwinDemo.Twin
                 DigitalTwin digitalTwin = new DigitalTwin();
 
                 await digitalTwin.DeleteAllTwinsAsync();
-
+                
             }
-
             Console.WriteLine("Digital Twin signing off!");
         }
     }

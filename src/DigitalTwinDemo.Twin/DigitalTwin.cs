@@ -1,6 +1,7 @@
 ﻿using Azure;
 using Azure.Core;
 using Azure.DigitalTwins.Core;
+using Azure.DigitalTwins.Core.Serialization;
 using Azure.Identity;
 using System;
 using System.Collections.Generic;
@@ -26,6 +27,14 @@ namespace DigitalTwinDemo.Twin
 
             _client = client;
         }
+
+
+
+
+        /// <summary>
+        /// Delete all the Twins and their relationships
+        /// </summary>
+        /// <returns></returns>
         public async Task DeleteAllTwinsAsync()
         {
             Console.WriteLine($"\nDeleting all twins");
@@ -37,36 +46,20 @@ namespace DigitalTwinDemo.Twin
                 await foreach (string item in qresult)
                 {
                     JsonDocument document = JsonDocument.Parse(item);
-                    if (document.RootElement.TryGetProperty("$dtId", out JsonElement eDtdl))
-                    {
-                        try
-                        {
-                            string twinId = eDtdl.GetString();
-                            twinlist.Add(twinId);
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine("No DTDL property in query result");
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Error: Can't find twin id in query result:\n {item}");
-                    }
+                    document.RootElement.TryGetProperty("$dtId", out JsonElement eDtdl);
+                    twinlist.Add(eDtdl.GetString());
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error in query execution: {ex.Message}");
             }
-
-
+            
             Console.WriteLine($"Step 2: Find and remove relationships for each twin...", ConsoleColor.DarkYellow);
             foreach (string twinId in twinlist)
             {
-                // Remove any relationships for the twin
-                // await FindAndDeleteOutgoingRelationshipsAsync(twinId).ConfigureAwait(false);
-                //await FindAndDeleteIncomingRelationshipsAsync(twinId).ConfigureAwait(false);
+                await FindAndDeleteOutgoingRelationshipsAsync(twinId).ConfigureAwait(false);
+                await FindAndDeleteIncomingRelationshipsAsync(twinId).ConfigureAwait(false);
             }
 
             Console.WriteLine($"Step 3: Delete all twins", ConsoleColor.DarkYellow);
@@ -81,6 +74,39 @@ namespace DigitalTwinDemo.Twin
                 {
                     Console.WriteLine($"*** Error {ex.Status}/{ex.ErrorCode} deleting twin {twinId} due to {ex.Message}");
                 }
+            }
+        }
+
+        public async Task FindAndDeleteOutgoingRelationshipsAsync(string twinId)
+        {
+            try
+            {
+                await foreach (string relJson in _client.GetRelationshipsAsync(twinId))
+                {
+                    var rel = JsonSerializer.Deserialize<BasicRelationship>(relJson);
+                    await _client.DeleteRelationshipAsync(twinId, rel.Id).ConfigureAwait(false);
+                    Console.WriteLine($"Deleted relationship {rel.Id} from {twinId}");
+                }
+            }
+            catch (RequestFailedException ex)
+            {
+                Console.WriteLine($"*** Error {ex.Status}/{ex.ErrorCode} retrieving or deleting relationships for {twinId} due to {ex.Message}");
+            }
+        }
+
+        async Task FindAndDeleteIncomingRelationshipsAsync(string twinId)
+        {
+            try
+            {
+                await foreach (IncomingRelationship incomingRel in _client.GetIncomingRelationshipsAsync(twinId))
+                {
+                    await _client.DeleteRelationshipAsync(incomingRel.SourceId, incomingRel.RelationshipId).ConfigureAwait(false);
+                    Console.WriteLine($"Deleted incoming relationship {incomingRel.RelationshipId} from {twinId}");
+                }
+            }
+            catch (RequestFailedException ex)
+            {
+                Console.WriteLine($"*** Error {ex.Status}/{ex.ErrorCode} retrieving or deleting incoming relationships for {twinId} due to {ex.Message}");
             }
         }
     }
