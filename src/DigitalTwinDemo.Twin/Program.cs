@@ -7,19 +7,21 @@ namespace DigitalTwinDemo.Twin
     {
         static async Task Main(string[] args)
         {
-            Console.WriteLine("Hello Twin!");
-            Console.WriteLine("Please enter 'SetupDigitalTwin' to create the Digital Twin!");
-            string command = Console.ReadLine().Trim();
+            //Console.WriteLine("Hello Twin!");
+            //Console.WriteLine("Please enter 'SetupDigitalTwin' to create the Digital Twin!");
+            //string command = Console.ReadLine().Trim();
 
-            if(command.Equals("SetupDigitalTwin",StringComparison.OrdinalIgnoreCase))
-            {
+            //if(command.Equals("SetupDigitalTwin",StringComparison.OrdinalIgnoreCase))
+            //{
                 Console.WriteLine("Going....");
                 DigitalTwin digitalTwin = new DigitalTwin();
 
-                await digitalTwin.DeleteAllTwinsAsync();
+                await digitalTwin.CleanupEnvironment();
+
+                await digitalTwin.CreateHouseTwin();
                 
-            }
-            Console.WriteLine("Digital Twin signing off!");
+            //}
+            //Console.WriteLine("Digital Twin signing off!");
         }
     }
 }

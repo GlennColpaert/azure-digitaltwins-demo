@@ -9,6 +9,19 @@
     <PackageReference Include="Azure.Core" Version="1.3.0" />
     <PackageReference Include="Azure.DigitalTwins.Core" Version="1.0.0-preview.3" />
     <PackageReference Include="Azure.Identity" Version="1.2.0-preview.5" />
+    <PackageReference Include="Microsoft.Azure.DigitalTwins.Parser" Version="3.8.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Models\room.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Models\floor.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Models\house.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

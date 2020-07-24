@@ -1,0 +1,23 @@
+{
+  "@id": "dtmi:demo:House;1",
+  "@type": "Interface",
+  "displayName": "House Interface Model",
+  "@context": "dtmi:dtdl:context;2",
+  "contents": [
+    {
+      "name": "ConstructionYear",
+      "@type": "Property",
+      "schema": "string"
+    },
+    {
+      "name": "Owner",
+      "@type": "Property",
+      "schema": "string"
+    },
+    {
+      "@type": "Relationship",
+      "name": "floors",
+      "target": "dtmi:demo:Floor;1"
+    }
+  ]
+}

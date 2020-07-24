@@ -1,0 +1,13 @@
+{
+  "@id": "dtmi:demo:Floor;1",
+  "@type": "Interface",
+  "displayName": "Floor Interface Model",
+  "@context": "dtmi:dtdl:context;2",
+  "contents": [
+    {
+      "@type": "Relationship",
+      "name": "rooms",
+      "target": "dtmi:demo:Room;1"
+    }
+  ]
+}

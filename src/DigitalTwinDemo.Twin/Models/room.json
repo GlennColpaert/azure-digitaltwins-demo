@@ -1,0 +1,18 @@
+{
+  "@id": "dtmi:demo:Room;1",
+  "@type": "Interface",
+  "displayName": "Room Interface Model",
+  "@context": "dtmi:dtdl:context;2",
+  "contents": [
+    {
+      "@type": "Property",
+      "name": "Temperature",
+      "schema": "double"
+    },
+    {
+      "@type": "Property",
+      "name": "Humidity",
+      "schema": "double"
+    }
+  ]
+}

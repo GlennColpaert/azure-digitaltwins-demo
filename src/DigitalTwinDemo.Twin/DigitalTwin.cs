@@ -5,6 +5,7 @@ using Azure.DigitalTwins.Core.Serialization;
 using Azure.Identity;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -18,6 +19,8 @@ namespace DigitalTwinDemo.Twin
         private static string tenantId = "d4842539-1664-4a55-981e-a6a6643b6d02";
         private static string adtInstanceUrl = "https://adt-demo-glenn.api.neu.digitaltwins.azure.net";
 
+        private CommandLoop _commandLoop;
+
         const string adtAppId = "https://digitaltwins.azure.net";
         public DigitalTwin()
         {
@@ -26,88 +29,194 @@ namespace DigitalTwinDemo.Twin
             Utils.IgnoreErrors(() => client.GetDigitalTwin(""));
 
             _client = client;
+
+            _commandLoop = new CommandLoop(client);
         }
 
-
-
-
-        /// <summary>
-        /// Delete all the Twins and their relationships
-        /// </summary>
-        /// <returns></returns>
-        public async Task DeleteAllTwinsAsync()
-        {
-            Console.WriteLine($"\nDeleting all twins");
-            Console.WriteLine($"Step 1: Find all twins", ConsoleColor.DarkYellow);
-            List<string> twinlist = new List<string>();
+        public async Task CreateHouseTwin()
+        {         
             try
             {
-                AsyncPageable<string> qresult = _client.QueryAsync("SELECT * FROM DIGITALTWINS");
-                await foreach (string item in qresult)
-                {
-                    JsonDocument document = JsonDocument.Parse(item);
-                    document.RootElement.TryGetProperty("$dtId", out JsonElement eDtdl);
-                    twinlist.Add(eDtdl.GetString());
-                }
+                List<string> dtdlList = ParseDTDLModels();
+                Response<ModelData[]> res = await _client.CreateModelsAsync(dtdlList);
+                Console.WriteLine($"Model(s) created successfully!");
+            }
+            catch (RequestFailedException e)
+            {
+                Console.WriteLine($"Response {e.Status}: {e.Message}");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in query execution: {ex.Message}");
+                Console.WriteLine($"Error: {ex.Message}");
             }
             
-            Console.WriteLine($"Step 2: Find and remove relationships for each twin...", ConsoleColor.DarkYellow);
-            foreach (string twinId in twinlist)
+            var metaData = new Dictionary<string, object>()
             {
-                await FindAndDeleteOutgoingRelationshipsAsync(twinId).ConfigureAwait(false);
-                await FindAndDeleteIncomingRelationshipsAsync(twinId).ConfigureAwait(false);
-            }
+                { "$model", "dtmi:demo:House;2"},
+                { "$kind", "DigitalTwin" }
+            };
 
-            Console.WriteLine($"Step 3: Delete all twins", ConsoleColor.DarkYellow);
-            foreach (string twinId in twinlist)
+            var twinData = new Dictionary<string, object>()
             {
-                try
-                {
-                    await _client.DeleteDigitalTwinAsync(twinId).ConfigureAwait(false);
-                    Console.WriteLine($"Deleted twin {twinId}");
-                }
-                catch (RequestFailedException ex)
-                {
-                    Console.WriteLine($"*** Error {ex.Status}/{ex.ErrorCode} deleting twin {twinId} due to {ex.Message}");
-                }
-            }
+                 { "$metadata", metaData},
+                 { "ConstructionYear", "1985" },
+                 { "Owner", "Glenn Colpaert" }
+            };
+
+            await _client.CreateDigitalTwinAsync("127.0.0.1", JsonSerializer.Serialize(twinData));
+            Console.WriteLine($"Localhost Twin created successfully!");
+
+            metaData = new Dictionary<string, object>()
+            {
+                { "$model", "dtmi:demo:Floor;1"},
+                { "$kind", "DigitalTwin" }
+            };
+
+            twinData = new Dictionary<string, object>()
+            {
+                 { "$metadata", metaData}
+            };
+
+            await _client.CreateDigitalTwinAsync("Floor1", JsonSerializer.Serialize(twinData));
+            Console.WriteLine($"Floor1 Twin created successfully!");
+
+            await _client.CreateDigitalTwinAsync("Floor2", JsonSerializer.Serialize(twinData));
+            Console.WriteLine($"Floor2 Twin created successfully!");
+
+            await _client.CreateDigitalTwinAsync("Floor3", JsonSerializer.Serialize(twinData));
+            Console.WriteLine($"Floor3 Twin created successfully!");
+
+            metaData = new Dictionary<string, object>()
+            {
+                { "$model", "dtmi:demo:Room;1"},
+                { "$kind", "DigitalTwin" }
+            };
+
+            twinData = new Dictionary<string, object>()
+            {
+                 { "$metadata", metaData}
+            };
+
+            await _client.CreateDigitalTwinAsync("Kitchen", JsonSerializer.Serialize(twinData));
+            Console.WriteLine($"Kitchen Twin created successfully!");
+
+            await _client.CreateDigitalTwinAsync("LivingRoom", JsonSerializer.Serialize(twinData));
+            Console.WriteLine($"LivingRoom Twin created successfully!");
+
+            await _client.CreateDigitalTwinAsync("Bedroom1", JsonSerializer.Serialize(twinData));
+            Console.WriteLine($"Bedroom1 Twin created successfully!");
+
+            await _client.CreateDigitalTwinAsync("Bedroom2", JsonSerializer.Serialize(twinData));
+            Console.WriteLine($"Bedroom2 Twin created successfully!");
+
+            await _client.CreateDigitalTwinAsync("Bathroom", JsonSerializer.Serialize(twinData));
+            Console.WriteLine($"Bathroom Twin created successfully!");
+
+            await _client.CreateDigitalTwinAsync("MasterBedroom", JsonSerializer.Serialize(twinData));
+            Console.WriteLine($"MasterBedroom Twin created successfully!");
+
+
+            var body = new Dictionary<string, object>()
+            {
+                { "$targetId", "Floor1"},
+                { "$relationshipName", "floors"}
+            };
+            await _client.CreateRelationshipAsync("127.0.0.1", "localhost_to_Floor1", JsonSerializer.Serialize(body));
+            Console.WriteLine($"Relationship localhost_to_Floor1 created successfully!");
+
+            body = new Dictionary<string, object>()
+            {
+                { "$targetId", "Floor2"},
+                { "$relationshipName", "floors"}
+            };
+            await _client.CreateRelationshipAsync("127.0.0.1", "localhost_to_floor2", JsonSerializer.Serialize(body));
+            Console.WriteLine($"Relationship localhost_to_floor2 created successfully!");
+
+            body = new Dictionary<string, object>()
+            {
+                { "$targetId", "Floor3"},
+                { "$relationshipName", "floors"}
+            };
+            await _client.CreateRelationshipAsync("127.0.0.1", "localhost_to_floor3", JsonSerializer.Serialize(body));
+            Console.WriteLine($"Relationship localhost_to_floor3 created successfully!");
+
+            body = new Dictionary<string, object>()
+            {
+                { "$targetId", "Kitchen"},
+                { "$relationshipName", "rooms"}
+            };
+            await _client.CreateRelationshipAsync("Floor1", "Floor1_to_kitchen", JsonSerializer.Serialize(body));
+            Console.WriteLine($"Relationship Floor1_to_kitchen created successfully!");
+
+            body = new Dictionary<string, object>()
+            {
+                { "$targetId", "LivingRoom"},
+                { "$relationshipName", "rooms"}
+            };
+            await _client.CreateRelationshipAsync("Floor1", "Floor1_to_livingroom", JsonSerializer.Serialize(body));
+            Console.WriteLine($"Relationship Floor1_to_livingroom created successfully!");
+
+            body = new Dictionary<string, object>()
+            {
+                { "$targetId", "Bathroom"},
+                { "$relationshipName", "rooms"}
+            };
+            await _client.CreateRelationshipAsync("Floor2", "floor2_to_bathroom", JsonSerializer.Serialize(body));
+            Console.WriteLine($"Relationship floor2_to_bathroom created successfully!");
+
+            body = new Dictionary<string, object>()
+            {
+                { "$targetId", "Bedroom1"},
+                { "$relationshipName", "rooms"}
+            };
+            await _client.CreateRelationshipAsync("Floor2", "floor2_to_bedroom1", JsonSerializer.Serialize(body));
+            Console.WriteLine($"Relationship floor2_to_bedroom1 created successfully!");
+
+            body = new Dictionary<string, object>()
+            {
+                { "$targetId", "Bedroom2"},
+                { "$relationshipName", "rooms"}
+            };
+            await _client.CreateRelationshipAsync("Floor2", "floor2_to_bedroom2", JsonSerializer.Serialize(body));
+            Console.WriteLine($"Relationship floor2_to_bedroom2 created successfully!");
+
+            body = new Dictionary<string, object>()
+            {
+                { "$targetId", "MasterBedroom"},
+                { "$relationshipName", "rooms"}
+            };
+            await _client.CreateRelationshipAsync("Floor3", "floor3_to_masterbedroom", JsonSerializer.Serialize(body));
+            Console.WriteLine($"Relationship floor3_to_masterbedroom created successfully!");
+
         }
 
-        public async Task FindAndDeleteOutgoingRelationshipsAsync(string twinId)
+        private List<string> ParseDTDLModels()
         {
-            try
+            string[] models = new string[3] { "floor", "house", "room" };
+            string consoleAppDir = Path.Combine(Directory.GetCurrentDirectory(), @"Models");
+
+            List<string> dtdlList = new List<string>();
+            for (int i = 0; i < models.Length; i++)
             {
-                await foreach (string relJson in _client.GetRelationshipsAsync(twinId))
-                {
-                    var rel = JsonSerializer.Deserialize<BasicRelationship>(relJson);
-                    await _client.DeleteRelationshipAsync(twinId, rel.Id).ConfigureAwait(false);
-                    Console.WriteLine($"Deleted relationship {rel.Id} from {twinId}");
-                }
+                string filename = Path.Combine(consoleAppDir, models[i] + ".json");
+                StreamReader r = new StreamReader(filename);
+                string dtdl = r.ReadToEnd();
+                r.Close();
+                dtdlList.Add(dtdl);
             }
-            catch (RequestFailedException ex)
-            {
-                Console.WriteLine($"*** Error {ex.Status}/{ex.ErrorCode} retrieving or deleting relationships for {twinId} due to {ex.Message}");
-            }
+
+            return dtdlList;
         }
 
-        async Task FindAndDeleteIncomingRelationshipsAsync(string twinId)
+        /// <summary>
+        /// Cleans the existing environment by deleting all the Twins and their relationships
+        /// </summary>
+        /// <returns></returns>
+        public async Task CleanupEnvironment()
         {
-            try
-            {
-                await foreach (IncomingRelationship incomingRel in _client.GetIncomingRelationshipsAsync(twinId))
-                {
-                    await _client.DeleteRelationshipAsync(incomingRel.SourceId, incomingRel.RelationshipId).ConfigureAwait(false);
-                    Console.WriteLine($"Deleted incoming relationship {incomingRel.RelationshipId} from {twinId}");
-                }
-            }
-            catch (RequestFailedException ex)
-            {
-                Console.WriteLine($"*** Error {ex.Status}/{ex.ErrorCode} retrieving or deleting incoming relationships for {twinId} due to {ex.Message}");
-            }
+            await _commandLoop.DeleteAllTwinsAsync();
         }
+
+
     }
 }
