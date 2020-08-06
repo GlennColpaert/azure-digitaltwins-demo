@@ -1,9 +1,14 @@
 {
-  "@id": "dtmi:demo:Room;1",
+  "@id": "dtmi:demo:Sensor;1",
   "@type": "Interface",
-  "displayName": "Room Interface Model",
+  "displayName": "Thermostat interface model",
   "@context": "dtmi:dtdl:context;2",
   "contents": [
+    {
+      "@type": "Property",
+      "name": "FirmwareVersion",
+      "schema": "string"
+    },
     {
       "@type": "Property",
       "name": "Temperature",
@@ -13,11 +18,6 @@
       "@type": "Property",
       "name": "Humidity",
       "schema": "double"
-    },
-    {
-      "@type": "Relationship",
-      "name": "sensors",
-      "target": "dtmi:demo:Sensor;1"
     }
   ]
 }

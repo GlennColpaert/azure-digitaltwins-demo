@@ -52,7 +52,7 @@ namespace DigitalTwinDemo.Twin
             
             var metaData = new Dictionary<string, object>()
             {
-                { "$model", "dtmi:demo:House;2"},
+                { "$model", "dtmi:demo:House;1"},
                 { "$kind", "DigitalTwin" }
             };
 
@@ -114,6 +114,36 @@ namespace DigitalTwinDemo.Twin
 
             await _client.CreateDigitalTwinAsync("MasterBedroom", JsonSerializer.Serialize(twinData));
             Console.WriteLine($"MasterBedroom Twin created successfully!");
+
+            metaData = new Dictionary<string, object>()
+            {
+                { "$model", "dtmi:demo:Sensor;1"},
+                { "$kind", "DigitalTwin" }
+            };
+
+            twinData = new Dictionary<string, object>()
+            {
+                 { "$metadata", metaData},
+                 { "FirmwareVersion", "2020.ADT.5782.3" },
+            };
+
+            await _client.CreateDigitalTwinAsync("TStat001", JsonSerializer.Serialize(twinData));
+            Console.WriteLine($"TStat001 Twin created successfully!");
+
+            await _client.CreateDigitalTwinAsync("TStat002", JsonSerializer.Serialize(twinData));
+            Console.WriteLine($"TStat002 Twin created successfully!");
+
+            await _client.CreateDigitalTwinAsync("TStat003", JsonSerializer.Serialize(twinData));
+            Console.WriteLine($"TStat003 Twin created successfully!");
+
+            await _client.CreateDigitalTwinAsync("TStat004", JsonSerializer.Serialize(twinData));
+            Console.WriteLine($"TStat004 Twin created successfully!");
+
+            await _client.CreateDigitalTwinAsync("TStat005", JsonSerializer.Serialize(twinData));
+            Console.WriteLine($"TStat005 Twin created successfully!");
+
+            await _client.CreateDigitalTwinAsync("TStat006", JsonSerializer.Serialize(twinData));
+            Console.WriteLine($"TStat006 Twin created successfully!");
 
 
             var body = new Dictionary<string, object>()
@@ -188,11 +218,61 @@ namespace DigitalTwinDemo.Twin
             await _client.CreateRelationshipAsync("Floor3", "floor3_to_masterbedroom", JsonSerializer.Serialize(body));
             Console.WriteLine($"Relationship floor3_to_masterbedroom created successfully!");
 
+            body = new Dictionary<string, object>()
+            {
+                { "$targetId", "TStat001"},
+                { "$relationshipName", "sensors"}
+            };
+            await _client.CreateRelationshipAsync("Kitchen", "kitchen_to_tstat001", JsonSerializer.Serialize(body));
+            Console.WriteLine($"Relationship kitchen_to_tstat001 created successfully!");
+
+            body = new Dictionary<string, object>()
+            {
+                { "$targetId", "TStat001"},
+                { "$relationshipName", "sensors"}
+            };
+            await _client.CreateRelationshipAsync("LivingRoom", "livingroom_to_tstat001", JsonSerializer.Serialize(body));
+            Console.WriteLine($"Relationship LivingRoom_to_tstat001 created successfully!");
+
+            body = new Dictionary<string, object>()
+            {
+                { "$targetId", "TStat002"},
+                { "$relationshipName", "sensors"}
+            };
+            await _client.CreateRelationshipAsync("Bedroom1", "bedroom_to_tstat002", JsonSerializer.Serialize(body));
+            Console.WriteLine($"Relationship bedroom_to_tstat002 created successfully!");
+
+
+            body = new Dictionary<string, object>()
+            {
+                { "$targetId", "TStat003"},
+                { "$relationshipName", "sensors"}
+            };
+            await _client.CreateRelationshipAsync("Bedroom2", "bedroom2_to_tstat003", JsonSerializer.Serialize(body));
+            Console.WriteLine($"Relationship bedroom2_to_tstat003 created successfully!");
+
+            body = new Dictionary<string, object>()
+            {
+                { "$targetId", "TStat004"},
+                { "$relationshipName", "sensors"}
+            };
+            await _client.CreateRelationshipAsync("Bathroom", "bathroom_to_tstat004", JsonSerializer.Serialize(body));
+            Console.WriteLine($"Relationship bathroom_to_tstat004 created successfully!");
+
+            body = new Dictionary<string, object>()
+            {
+                { "$targetId", "TStat005"},
+                { "$relationshipName", "sensors"}
+            };
+            await _client.CreateRelationshipAsync("MasterBedroom", "masterbedroom_to_tstat005", JsonSerializer.Serialize(body));
+            Console.WriteLine($"Relationship masterbedroom_to_tstat005 created successfully!");
+
+
         }
 
         private List<string> ParseDTDLModels()
         {
-            string[] models = new string[3] { "floor", "house", "room" };
+            string[] models = new string[4] { "floor", "house", "room", "thermostat" };
             string consoleAppDir = Path.Combine(Directory.GetCurrentDirectory(), @"Models");
 
             List<string> dtdlList = new List<string>();
@@ -216,7 +296,5 @@ namespace DigitalTwinDemo.Twin
         {
             await _commandLoop.DeleteAllTwinsAsync();
         }
-
-
     }
 }
