@@ -121,10 +121,13 @@ namespace DigitalTwinDemo.Twin
                 { "$kind", "DigitalTwin" }
             };
 
+            //Yes you have to initialize Temp and Hum as default
             twinData = new Dictionary<string, object>()
             {
                  { "$metadata", metaData},
                  { "FirmwareVersion", "2020.ADT.5782.3" },
+                 { "Temperature", 0 },
+                 { "Humidity", 0},
             };
 
             await _client.CreateDigitalTwinAsync("TStat001", JsonSerializer.Serialize(twinData));
@@ -141,9 +144,6 @@ namespace DigitalTwinDemo.Twin
 
             await _client.CreateDigitalTwinAsync("TStat005", JsonSerializer.Serialize(twinData));
             Console.WriteLine($"TStat005 Twin created successfully!");
-
-            await _client.CreateDigitalTwinAsync("TStat006", JsonSerializer.Serialize(twinData));
-            Console.WriteLine($"TStat006 Twin created successfully!");
 
 
             var body = new Dictionary<string, object>()
@@ -266,7 +266,6 @@ namespace DigitalTwinDemo.Twin
             };
             await _client.CreateRelationshipAsync("MasterBedroom", "masterbedroom_to_tstat005", JsonSerializer.Serialize(body));
             Console.WriteLine($"Relationship masterbedroom_to_tstat005 created successfully!");
-
 
         }
 

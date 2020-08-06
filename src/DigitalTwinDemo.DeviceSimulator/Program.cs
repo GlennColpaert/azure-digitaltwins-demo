@@ -1,6 +1,7 @@
 ﻿using Microsoft.Azure.Devices.Client;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,13 +16,25 @@ namespace DigitalTwinDemo.DeviceSimulator
 
         static async Task Main(string[] args)
         {
-            string sDevice01 = ConfigurationManager.AppSettings["TStat001"];
-            string sDevice02 = ConfigurationManager.AppSettings["TStat001"];
+            //string sDevice01 = ConfigurationManager.AppSettings["TStat001"];
+            //string sDevice02 = ConfigurationManager.AppSettings["TStat001"];
 
-            Task task1 = Task.Factory.StartNew(() => SimulateDeviceAsync("Device001", sDevice01));
-            Task task2 = Task.Factory.StartNew(() => SimulateDeviceAsync("Device002", sDevice02));
+            // Task task1 = Task.Factory.StartNew(() => SimulateDeviceAsync("Device001", sDevice01));
+            //Task task2 = Task.Factory.StartNew(() => SimulateDeviceAsync("Device002", sDevice02));
 
-            await Task.WhenAll(task1, task2);
+            List<Task> taskList = new List<Task>();
+
+            for (int i = 1; i < 6; i++)
+            {
+                var deviceName = "TStat00" + i;
+                var connString = ConfigurationManager.AppSettings[deviceName];
+
+                taskList.Add(
+                    Task.Factory.StartNew(() => SimulateDeviceAsync(deviceName, connString))
+                    );
+            }
+
+            await Task.WhenAll(taskList);
             Console.ReadLine();
         }
 
