@@ -125,9 +125,10 @@ namespace DigitalTwinDemo.Twin
             twinData = new Dictionary<string, object>()
             {
                  { "$metadata", metaData},
-                 { "FirmwareVersion", "2020.ADT.5782.3" },
-                 { "Temperature", 0 },
-                 { "Humidity", 0},
+                 { "FirmwareVersion", "2020.ADT.5782.3" }
+                //,
+                // { "Temperature", 0 },
+                // { "Humidity", 0},
             };
 
             await _client.CreateDigitalTwinAsync("TStat001", JsonSerializer.Serialize(twinData));

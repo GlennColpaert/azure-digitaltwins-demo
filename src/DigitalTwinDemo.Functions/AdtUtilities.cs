@@ -86,7 +86,8 @@ namespace DigitalTwinDemo.Functions
                 List<Dictionary<string, object>> ops = new List<Dictionary<string, object>>();
                 ops.Add(new Dictionary<string, object>()
                 {
-                    { "op", "replace"},
+                    { "op", "add"},
+                    //{ "op", "replace"},
                     { "path", propertyPath},
                     { "value", value}
                 });
