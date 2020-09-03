@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DigitalTwinDemo.DeviceSimul
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DigitalTwinDemo.Twin", "DigitalTwinDemo.Twin\DigitalTwinDemo.Twin.csproj", "{33D4E9F0-C96A-4D15-8C01-2195FA84ACEF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DigitalTwinDemo.Functions", "DigitalTwinDemo.Functions\DigitalTwinDemo.Functions.csproj", "{4EDAA839-CC91-421C-99BB-F633B642F9C0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DigitalTwinDemo.Functions", "DigitalTwinDemo.Functions\DigitalTwinDemo.Functions.csproj", "{4EDAA839-CC91-421C-99BB-F633B642F9C0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

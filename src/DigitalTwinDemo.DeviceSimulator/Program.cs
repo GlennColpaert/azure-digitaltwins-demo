@@ -16,12 +16,6 @@ namespace DigitalTwinDemo.DeviceSimulator
 
         static async Task Main(string[] args)
         {
-            //string sDevice01 = ConfigurationManager.AppSettings["TStat001"];
-            //string sDevice02 = ConfigurationManager.AppSettings["TStat001"];
-
-            // Task task1 = Task.Factory.StartNew(() => SimulateDeviceAsync("Device001", sDevice01));
-            //Task task2 = Task.Factory.StartNew(() => SimulateDeviceAsync("Device002", sDevice02));
-
             List<Task> taskList = new List<Task>();
 
             for (int i = 1; i < 6; i++)

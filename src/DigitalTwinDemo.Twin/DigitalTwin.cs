@@ -15,9 +15,9 @@ namespace DigitalTwinDemo.Twin
     public class DigitalTwin
     {
         private DigitalTwinsClient _client;
-        private static string clientId = "87ab6291-a6b7-40e3-8e59-5c9bf1847f12";
-        private static string tenantId = "d4842539-1664-4a55-981e-a6a6643b6d02";
-        private static string adtInstanceUrl = "https://adt-demo-glenn.api.neu.digitaltwins.azure.net";
+        private static string clientId = "";
+        private static string tenantId = "";
+        private static string adtInstanceUrl = "";
 
         private CommandLoop _commandLoop;
 
@@ -122,6 +122,7 @@ namespace DigitalTwinDemo.Twin
             };
 
             //Yes you have to initialize Temp and Hum as default
+            //Unless you do an add (instead of replace) as update operation to the query interface.
             twinData = new Dictionary<string, object>()
             {
                  { "$metadata", metaData},

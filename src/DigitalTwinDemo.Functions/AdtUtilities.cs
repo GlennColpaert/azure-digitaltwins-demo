@@ -10,6 +10,10 @@ using System.Threading.Tasks;
 
 namespace DigitalTwinDemo.Functions
 {
+    /// <summary>
+    /// Taken from the Azure Digital Twin official Sample
+    /// https://github.com/Azure-Samples/digital-twins-samples/tree/master/
+    /// </summary>
     static class AdtUtilities
     {
         public static async Task<string> FindParent(DigitalTwinsClient client, string child, string relname, ILogger log)
